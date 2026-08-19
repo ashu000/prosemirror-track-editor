@@ -124,6 +124,7 @@ export function App() {
         body: JSON.stringify({
           html: editorRef.current?.getHtml() ?? '',
           changes: editorRef.current?.getChanges() ?? { deletedText: [], addedText: [] },
+          changesWithOffsets: editorRef.current?.getChangesWithOffsets() ?? [],
           originalText: editorRef.current?.getOriginalText() ?? '',
         }),
       });
