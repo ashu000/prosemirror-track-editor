@@ -7,7 +7,7 @@ A headless-first React editor with track-changes (insertion/deletion marks), phr
 ## Install
 
 ```bash
-npm i prosemirror-track-editor
+npm i @ashutosh-dubey3/prosemirror-track-editor
 # peer deps
 npm i react react-dom prosemirror-state prosemirror-view prosemirror-model \
       prosemirror-schema-basic prosemirror-history prosemirror-keymap prosemirror-commands
@@ -17,7 +17,7 @@ npm i react react-dom prosemirror-state prosemirror-view prosemirror-model \
 
 ```tsx
 import { useRef } from 'react';
-import { TrackEditor, TrackEditorRef } from 'prosemirror-track-editor';
+import { TrackEditor, TrackEditorRef } from '@ashutosh-dubey3/prosemirror-track-editor';
 
 export function MyEditor() {
   const editorRef = useRef<TrackEditorRef>(null);
