@@ -19,6 +19,23 @@ const DARK_THEME_VARS: React.CSSProperties = {
   ['--te-phrase-shadow' as string]: 'rgba(0,201,167,0.2)',
 };
 
+const actionBtn = (variant: 'primary' | 'default' | 'danger'): React.CSSProperties => ({
+  padding: '8px 16px',
+  fontSize: 13,
+  fontWeight: 600,
+  border: 'none',
+  borderRadius: 6,
+  cursor: 'pointer',
+  background:
+    variant === 'primary' ? '#2563eb'
+    : variant === 'danger' ? '#fee2e2'
+    : '#f3f4f6',
+  color:
+    variant === 'primary' ? '#fff'
+    : variant === 'danger' ? '#b91c1c'
+    : '#374151',
+});
+
 const styles: Record<string, React.CSSProperties> = {
   page: {
     maxWidth: 800,
@@ -62,22 +79,6 @@ const styles: Record<string, React.CSSProperties> = {
   },
   status: { fontSize: 12, color: '#6b7280', marginTop: 6 },
   actions: { display: 'flex', gap: 8, flexWrap: 'wrap' as const, marginBottom: '1rem' },
-  actionBtn: (variant: 'primary' | 'default' | 'danger') => ({
-    padding: '8px 16px',
-    fontSize: 13,
-    fontWeight: 600,
-    border: 'none',
-    borderRadius: 6,
-    cursor: 'pointer',
-    background:
-      variant === 'primary' ? '#2563eb'
-      : variant === 'danger' ? '#fee2e2'
-      : '#f3f4f6',
-    color:
-      variant === 'primary' ? '#fff'
-      : variant === 'danger' ? '#b91c1c'
-      : '#374151',
-  }),
   resultBox: {
     background: '#f9fafb',
     border: '1px solid #e5e7eb',
@@ -213,16 +214,16 @@ export function App() {
       </div>
 
       <div style={styles.actions}>
-        <button style={styles.actionBtn('primary')} onClick={handleProcess} disabled={isLoading}>
+        <button style={actionBtn('primary')} onClick={handleProcess} disabled={isLoading}>
           ✦ Process with AI
         </button>
-        <button style={styles.actionBtn('default')} onClick={handleValidate} disabled={isLoading}>
+        <button style={actionBtn('default')} onClick={handleValidate} disabled={isLoading}>
           ✓ Validate
         </button>
-        <button style={styles.actionBtn('default')} onClick={handleGetChanges}>
+        <button style={actionBtn('default')} onClick={handleGetChanges}>
           ⇄ Get Changes
         </button>
-        <button style={styles.actionBtn('danger')} onClick={handleClear}>
+        <button style={actionBtn('danger')} onClick={handleClear}>
           ✕ Clear
         </button>
       </div>

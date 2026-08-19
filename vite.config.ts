@@ -6,7 +6,7 @@ import { resolve } from 'path';
 export default defineConfig({
   plugins: [
     react(),
-    dts({ include: ['src'], rollupTypes: true }),
+    dts({ include: ['src'], rollupTypes: false }),
   ],
   build: {
     lib: {
@@ -36,8 +36,6 @@ export default defineConfig({
       },
     },
   },
-  // When running `vite` (dev mode), serve the demo app
-  root: 'demo',
   resolve: {
     alias: {
       '@prosemirror-track-editor': resolve(__dirname, 'src/index.ts'),
