@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3] - 2026-08-19
+
+### Fixed
+- `simulateDiff` in demo server no longer appends `_v2` to replaced words — substitutions now use a real synonym lookup table (e.g. `shall→must`, `furnish→provide`) so track-change marks show meaningful word replacements.
+
+### Changed
+- Demo server `getOriginalText()` is used as the Process with AI input (excludes pending deletions from the sent text).
+- README: added live Vercel demo badge and URL.
+
 ## [0.1.2] - 2026-08-19
 
 ### Added
