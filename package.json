@@ -74,7 +74,7 @@
   "author": "Ashutosh Dubey",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ashutosh-dubey3/prosemirror-track-editor.git"
+    "url": "git+https://github.com/ashutosh-dubey3/prosemirror-track-editor.git"
   },
   "license": "MIT"
 }
