@@ -52,6 +52,8 @@ export const TrackEditor = forwardRef<TrackEditorRef, TrackEditorProps>(
       isVisible = true,
       className,
       style,
+      ariaLabel,
+      ariaLabelledBy,
     },
     ref
   ) => {
@@ -583,7 +585,15 @@ export const TrackEditor = forwardRef<TrackEditorRef, TrackEditorProps>(
 
     return (
       <div className={className} style={style}>
-        <EditorWrapper ref={editorHostRef} $plainMode={disableTrackChanges} />
+        <EditorWrapper
+          ref={editorHostRef}
+          $plainMode={disableTrackChanges}
+          role="textbox"
+          aria-multiline="true"
+          aria-disabled={isDisabled || undefined}
+          aria-label={ariaLabel}
+          aria-labelledby={ariaLabelledBy}
+        />
       </div>
     );
   }

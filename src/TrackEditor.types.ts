@@ -30,4 +30,8 @@ export interface TrackEditorProps {
   onScrollToEnd?: () => void;
   className?: string;
   style?: CSSProperties;
+  /** Accessible label forwarded as aria-label on the editor element. */
+  ariaLabel?: string;
+  /** ID of an external label element, forwarded as aria-labelledby. */
+  ariaLabelledBy?: string;
 }

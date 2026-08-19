@@ -9,6 +9,7 @@ export default defineConfig({
     dts({ include: ['src'], rollupTypes: false }),
   ],
   build: {
+    sourcemap: true,
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
       name: 'ProseMirrorTrackEditor',

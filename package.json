@@ -17,6 +17,13 @@
     "dist",
     "LICENSE"
   ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=16"
+  },
+  "bugs": {
+    "url": "https://github.com/ashu000/prosemirror-track-editor/issues"
+  },
   "scripts": {
     "dev": "concurrently \"vite --config vite.demo.config.ts\" \"tsx demo/server/index.ts\"",
     "build": "vite build && tsc --emitDeclarationOnly",
@@ -33,11 +40,11 @@
     "prosemirror-state": ">=1",
     "prosemirror-view": ">=1",
     "react": ">=17",
-    "react-dom": ">=17"
+    "react-dom": ">=17",
+    "styled-components": "^5.3.0"
   },
   "dependencies": {
-    "@handlewithcare/prosemirror-suggest-changes": "*",
-    "styled-components": "^5.3.0"
+    "@handlewithcare/prosemirror-suggest-changes": "*"
   },
   "devDependencies": {
     "@types/cors": "^2.8.0",
@@ -58,6 +65,7 @@
     "prosemirror-schema-basic": "^1.2.4",
     "prosemirror-state": "^1.4.4",
     "prosemirror-view": "^1.42.2",
+    "styled-components": "^5.3.0",
     "tsx": "^4.23.12",
     "typescript": "^5.0.0",
     "vite": "^5.0.0",
