@@ -129,4 +129,4 @@ Requires a runtime that supports `ResizeObserver` and `MutationObserver` (all mo
 
 ## Full API
 
-See [`prosemirror-track-editor-plan.md`](./.claude/specs/prosemirror-track-editor-plan.md) for the complete props, ref API, and backend contract documentation.
+See [`SPEC.md`](./SPEC.md) for the complete props, ref API, theming variables, backend contract, and internals documentation.
