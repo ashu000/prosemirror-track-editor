@@ -19,23 +19,6 @@ const DARK_THEME_VARS: React.CSSProperties = {
   ['--te-phrase-shadow' as string]: 'rgba(0,201,167,0.2)',
 };
 
-const actionBtn = (variant: 'primary' | 'default' | 'danger'): React.CSSProperties => ({
-  padding: '8px 16px',
-  fontSize: 13,
-  fontWeight: 600,
-  border: 'none',
-  borderRadius: 6,
-  cursor: 'pointer',
-  background:
-    variant === 'primary' ? '#2563eb'
-    : variant === 'danger' ? '#fee2e2'
-    : '#f3f4f6',
-  color:
-    variant === 'primary' ? '#fff'
-    : variant === 'danger' ? '#b91c1c'
-    : '#374151',
-});
-
 const styles: Record<string, React.CSSProperties> = {
   page: {
     maxWidth: 800,
@@ -68,30 +51,44 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: 'pointer',
   },
   section: { marginBottom: '1.25rem' },
-  label: {
-    fontSize: 11,
-    fontWeight: 700,
-    letterSpacing: '0.8px',
-    textTransform: 'uppercase' as const,
+  hint: {
+    fontSize: 13,
     color: '#6b7280',
-    marginBottom: 6,
-    display: 'block',
+    marginBottom: 10,
+    lineHeight: 1.5,
   },
-  status: { fontSize: 12, color: '#6b7280', marginTop: 6 },
-  actions: { display: 'flex', gap: 8, flexWrap: 'wrap' as const, marginBottom: '1rem' },
-  resultBox: {
-    background: '#f9fafb',
+  actions: { display: 'flex', gap: 8, marginBottom: '1rem', marginTop: '0.75rem' },
+  processBtn: {
+    padding: '9px 20px',
+    fontSize: 14,
+    fontWeight: 600,
+    border: 'none',
+    borderRadius: 6,
+    cursor: 'pointer',
+    background: '#2563eb',
+    color: '#fff',
+  },
+  processBtnDisabled: {
+    padding: '9px 20px',
+    fontSize: 14,
+    fontWeight: 600,
+    border: 'none',
+    borderRadius: 6,
+    cursor: 'not-allowed',
+    background: '#93c5fd',
+    color: '#fff',
+  },
+  clearBtn: {
+    padding: '9px 16px',
+    fontSize: 14,
+    fontWeight: 600,
     border: '1px solid #e5e7eb',
-    borderRadius: 8,
-    padding: '1rem',
-    fontSize: 12,
-    fontFamily: 'monospace',
-    whiteSpace: 'pre-wrap' as const,
-    wordBreak: 'break-word' as const,
-    maxHeight: 300,
-    overflowY: 'auto' as const,
-    color: '#111',
+    borderRadius: 6,
+    cursor: 'pointer',
+    background: '#fff',
+    color: '#374151',
   },
+  status: { fontSize: 12, color: '#9ca3af', marginTop: 6 },
   errorBox: {
     background: '#fef2f2',
     border: '1px solid #fecaca',
@@ -99,25 +96,33 @@ const styles: Record<string, React.CSSProperties> = {
     padding: '0.75rem 1rem',
     fontSize: 13,
     color: '#b91c1c',
+    marginBottom: '1rem',
+  },
+  successBox: {
+    background: '#f0fdf4',
+    border: '1px solid #bbf7d0',
+    borderRadius: 8,
+    padding: '0.75rem 1rem',
+    fontSize: 13,
+    color: '#15803d',
+    marginBottom: '1rem',
   },
   loading: { fontSize: 13, color: '#6b7280', padding: '0.5rem 0' },
 };
 
 export function App() {
   const editorRef = useRef<TrackEditorRef>(null);
-  const [hasContent, setHasContent] = useState(true);
   const [isDirty, setIsDirty] = useState(false);
-  const [result, setResult] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [changeCount, setChangeCount] = useState<number | null>(null);
   const [processedHtml, setProcessedHtml] = useState<string | undefined>(undefined);
   const [processKey, setProcessKey] = useState(0);
   const [darkTheme, setDarkTheme] = useState(false);
 
-  const clearResult = () => { setResult(null); setError(null); };
-
   const handleProcess = async () => {
-    clearResult();
+    setError(null);
+    setChangeCount(null);
     const text = editorRef.current?.getOriginalText() ?? '';
     if (!text.trim()) { setError('Editor is empty.'); return; }
     setIsLoading(true);
@@ -131,53 +136,28 @@ export function App() {
       if (!res.ok) throw new Error(data.error ?? 'Process failed');
       setProcessedHtml(data.html);
       setProcessKey((k) => k + 1);
-      setResult(JSON.stringify({ changeCount: data.changeCount, processingMs: data.processingMs }, null, 2));
+      setChangeCount(data.changeCount);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Unknown error');
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleValidate = async () => {
-    clearResult();
-    setIsLoading(true);
-    try {
-      const res = await fetch(`${API}/validate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          html: editorRef.current?.getHtml() ?? '',
-          changes: editorRef.current?.getChanges() ?? { deletedText: [], addedText: [] },
-          changesWithOffsets: editorRef.current?.getChangesWithOffsets() ?? [],
-          originalText: editorRef.current?.getOriginalText() ?? '',
-        }),
-      });
-      const data = await res.json();
-      setResult(JSON.stringify(data, null, 2));
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Unknown error');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleGetChanges = () => {
-    clearResult();
-    const changes = editorRef.current?.getChanges() ?? { deletedText: [], addedText: [] };
-    setResult(JSON.stringify(changes, null, 2));
   };
 
   const handleClear = () => {
-    clearResult();
-    editorRef.current?.clearContent();
+    setError(null);
+    setChangeCount(null);
+    setProcessedHtml(undefined);
+    setProcessKey((k) => k + 1);
   };
 
   return (
     <div style={styles.page}>
       <div style={styles.header}>
         <h1 style={styles.title}>prosemirror-track-editor</h1>
-        <p style={styles.subtitle}>Track-changes editor demo</p>
+        <p style={styles.subtitle}>
+          A React track-changes editor — edit text, process with AI, review insertions and deletions inline.
+        </p>
         <div style={styles.toolbar}>
           <button style={styles.tbBtn} onClick={() => editorRef.current?.undo()}>↩ Undo</button>
           <button style={styles.tbBtn} onClick={() => editorRef.current?.redo()}>↪ Redo</button>
@@ -185,14 +165,15 @@ export function App() {
             style={darkTheme ? styles.tbBtnActive : styles.tbBtn}
             onClick={() => setDarkTheme((d) => !d)}
           >
-            {darkTheme ? '☀ Light theme' : '◑ Dark theme'}
+            {darkTheme ? '☀ Light' : '◑ Dark'}
           </button>
         </div>
       </div>
 
       <div style={styles.section}>
-        <span style={styles.label}>Editor</span>
-        {/* CSS variable overrides applied on this wrapper when dark theme is active */}
+        <p style={styles.hint}>
+          Edit the text below — add or delete words — then click <strong>Process with AI</strong> to see tracked changes applied inline.
+        </p>
         <div style={darkTheme ? DARK_THEME_VARS : undefined}>
           <TrackEditor
             key={processKey}
@@ -200,40 +181,35 @@ export function App() {
             initialText={processedHtml ? undefined : SAMPLE_TEXT}
             initialHtml={processedHtml}
             isVisible={true}
-            onTextChange={setHasContent}
             onContentChange={setIsDirty}
+            ariaLabel="Track changes editor"
           />
         </div>
         <p style={styles.status}>
-          Has content: <strong>{hasContent ? 'yes' : 'no'}</strong>
-          {' · '}
-          Changed: <strong>{isDirty ? 'yes' : 'no'}</strong>
-          {' · '}
-          Theme: <strong>{darkTheme ? 'dark' : 'light'}</strong>
+          {isDirty ? 'Unsaved changes' : 'No changes yet'}
+          {changeCount !== null && ` · ${changeCount} suggestion${changeCount !== 1 ? 's' : ''} applied`}
         </p>
       </div>
 
       <div style={styles.actions}>
-        <button style={actionBtn('primary')} onClick={handleProcess} disabled={isLoading}>
-          ✦ Process with AI
+        <button
+          style={isLoading ? styles.processBtnDisabled : styles.processBtn}
+          onClick={handleProcess}
+          disabled={isLoading}
+        >
+          {isLoading ? 'Processing…' : '✦ Process with AI'}
         </button>
-        <button style={actionBtn('default')} onClick={handleValidate} disabled={isLoading}>
-          ✓ Validate
-        </button>
-        <button style={actionBtn('default')} onClick={handleGetChanges}>
-          ⇄ Get Changes
-        </button>
-        <button style={actionBtn('danger')} onClick={handleClear}>
-          ✕ Clear
+        <button style={styles.clearBtn} onClick={handleClear}>
+          Reset
         </button>
       </div>
 
-      {isLoading && <p style={styles.loading}>Loading…</p>}
       {error && <div style={styles.errorBox}>{error}</div>}
-      {result && !isLoading && (
-        <div style={styles.section}>
-          <span style={styles.label}>Result</span>
-          <pre style={styles.resultBox}>{result}</pre>
+      {changeCount !== null && !error && (
+        <div style={styles.successBox}>
+          {changeCount === 0
+            ? 'No changes suggested.'
+            : `${changeCount} suggestion${changeCount !== 1 ? 's' : ''} applied — accept or reject each change in the editor.`}
         </div>
       )}
     </div>
