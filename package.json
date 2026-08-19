@@ -17,7 +17,7 @@
     "dist"
   ],
   "scripts": {
-    "dev": "concurrently \"vite\" \"tsx demo/server/index.ts\"",
+    "dev": "concurrently \"vite --config vite.demo.config.ts\" \"tsx demo/server/index.ts\"",
     "build": "vite build && tsc --emitDeclarationOnly",
     "test": "vitest run",
     "lint": "eslint src --ext .ts,.tsx",
@@ -71,5 +71,10 @@
     "diff",
     "suggest-changes"
   ],
+  "author": "Ashutosh Dubey",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ashutosh-dubey3/prosemirror-track-editor.git"
+  },
   "license": "MIT"
 }

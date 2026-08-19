@@ -37,4 +37,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `demo/tsconfig.json` — corrected `moduleResolution` from `"bundler"` (unsupported in this TypeScript version) to `"node"`; removed invalid `references` entry that required `composite: true` in the root config.
 - `src/TrackEditor.tsx` — `DOMSerializer` correctly imported from `prosemirror-model` (not `prosemirror-view` as in the original source).
 
-[0.1.0]: https://github.com/your-org/prosemirror-track-editor/releases/tag/v0.1.0
+[0.1.0]: https://github.com/ashutosh-dubey3/prosemirror-track-editor/releases/tag/v0.1.0
