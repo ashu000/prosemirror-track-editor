@@ -1,24 +1,68 @@
 import type { Request, Response } from 'express';
 
+// A small synonym map for common words; falls back to a paraphrase suffix.
+const SYNONYMS: Record<string, string> = {
+  furnish: 'provide',
+  provide: 'furnish',
+  shall: 'must',
+  must: 'shall',
+  required: 'mandatory',
+  mandatory: 'required',
+  submit: 'deliver',
+  deliver: 'submit',
+  request: 'require',
+  require: 'request',
+  additional: 'further',
+  further: 'additional',
+  within: 'no later than',
+  obtain: 'secure',
+  secure: 'obtain',
+  ensure: 'confirm',
+  confirm: 'ensure',
+  valid: 'effective',
+  effective: 'valid',
+  period: 'term',
+  term: 'period',
+  issuing: 'originating',
+  reserves: 'retains',
+  retains: 'reserves',
+  comply: 'adhere',
+  adhere: 'comply',
+  stated: 'specified',
+  specified: 'stated',
+  governing: 'applicable',
+  applicable: 'governing',
+};
+
+function synonymFor(word: string): string {
+  const lower = word.toLowerCase();
+  const syn = SYNONYMS[lower];
+  if (!syn) return word; // no synonym — leave unchanged
+  // Preserve original capitalisation
+  if (word[0] === word[0].toUpperCase()) {
+    return syn.charAt(0).toUpperCase() + syn.slice(1);
+  }
+  return syn;
+}
+
 function simulateDiff(text: string): string {
-  // Use a seeded-ish approach: change words whose index % 5 === 2 (~20%)
   const paragraphs = text.split('\n');
   let wordCounter = 0;
 
   const processedParagraphs = paragraphs.map((line) => {
     if (!line.trim()) return '<p></p>';
 
-    // Split preserving whitespace tokens
     const tokens = line.split(/(\s+)/);
     const result = tokens.map((token) => {
-      // Pass through whitespace tokens unchanged
       if (/^\s+$/.test(token) || token === '') return token;
 
       wordCounter += 1;
-      // Mark ~every 5th word as changed
+      // Only change words that have a known synonym (~every 5th word slot)
       if (wordCounter % 5 === 2 && token.length > 2) {
-        const newWord = token + '_v2';
-        return `<del>${token}</del><ins>${newWord}</ins>`;
+        const replacement = synonymFor(token);
+        // If no synonym found, skip this word (don't mark it changed)
+        if (replacement === token) return token;
+        return `<del>${token}</del><ins>${replacement}</ins>`;
       }
       return token;
     });

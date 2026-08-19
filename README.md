@@ -3,6 +3,7 @@
 [![npm](https://img.shields.io/npm/v/@ashu000/prosemirror-track-editor)](https://www.npmjs.com/package/@ashu000/prosemirror-track-editor)
 [![npm bundle size](https://img.shields.io/bundlephobia/minzip/@ashu000/prosemirror-track-editor)](https://bundlephobia.com/package/@ashu000/prosemirror-track-editor)
 [![license](https://img.shields.io/npm/l/@ashu000/prosemirror-track-editor)](./LICENSE)
+[![demo](https://img.shields.io/badge/demo-live-brightgreen)](https://prosemirror-track-editor.vercel.app)
 
 A headless-first React editor with track-changes (insertion/deletion marks), phrase navigation, and a clean ref API.
 
@@ -74,8 +75,9 @@ npm run build
 npm test
 ```
 
-- Demo app: http://localhost:5173
-- Backend API: http://localhost:3001
+- Live demo: https://prosemirror-track-editor.vercel.app
+- Local demo: http://localhost:5173
+- Local API: http://localhost:3001
 
 ## Theming
 
