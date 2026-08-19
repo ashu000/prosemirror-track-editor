@@ -118,7 +118,7 @@ export function App() {
 
   const handleProcess = async () => {
     clearResult();
-    const text = editorRef.current?.getText() ?? '';
+    const text = editorRef.current?.getOriginalText() ?? '';
     if (!text.trim()) { setError('Editor is empty.'); return; }
     setIsLoading(true);
     try {
