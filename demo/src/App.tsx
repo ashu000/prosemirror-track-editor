@@ -6,6 +6,19 @@ const SAMPLE_TEXT = `The applicant shall furnish all required documents within t
 
 const API = 'http://localhost:3001';
 
+const DARK_THEME_VARS: React.CSSProperties = {
+  ['--te-bg' as string]: '#1e2130',
+  ['--te-border' as string]: '#2a2f45',
+  ['--te-border-focus' as string]: '#00c9a7',
+  ['--te-ins-color' as string]: '#4d9fff',
+  ['--te-del-color' as string]: '#ff6070',
+  ['--te-blank-bg' as string]: '#2a1e00',
+  ['--te-blank-color' as string]: '#fbb040',
+  ['--te-phrase-bg' as string]: 'rgba(0,201,167,0.15)',
+  ['--te-phrase-border' as string]: '#00c9a7',
+  ['--te-phrase-shadow' as string]: 'rgba(0,201,167,0.2)',
+};
+
 const styles: Record<string, React.CSSProperties> = {
   page: {
     maxWidth: 800,
@@ -17,7 +30,7 @@ const styles: Record<string, React.CSSProperties> = {
   header: { marginBottom: '1.5rem' },
   title: { fontSize: 22, fontWeight: 700, margin: 0, letterSpacing: '-0.3px' },
   subtitle: { fontSize: 13, color: '#6b7280', margin: '4px 0 0' },
-  toolbar: { display: 'flex', gap: 8, marginTop: 12 },
+  toolbar: { display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' as const },
   tbBtn: {
     padding: '6px 14px',
     fontSize: 13,
@@ -25,6 +38,16 @@ const styles: Record<string, React.CSSProperties> = {
     border: '1px solid #d1d5db',
     borderRadius: 6,
     background: '#fff',
+    cursor: 'pointer',
+  },
+  tbBtnActive: {
+    padding: '6px 14px',
+    fontSize: 13,
+    fontWeight: 600,
+    border: '1px solid #00c9a7',
+    borderRadius: 6,
+    background: '#0f1117',
+    color: '#00c9a7',
     cursor: 'pointer',
   },
   section: { marginBottom: '1.25rem' },
@@ -88,6 +111,7 @@ export function App() {
   const [error, setError] = useState<string | null>(null);
   const [processedHtml, setProcessedHtml] = useState<string | undefined>(undefined);
   const [processKey, setProcessKey] = useState(0);
+  const [darkTheme, setDarkTheme] = useState(false);
 
   const clearResult = () => { setResult(null); setError(null); };
 
@@ -156,24 +180,35 @@ export function App() {
         <div style={styles.toolbar}>
           <button style={styles.tbBtn} onClick={() => editorRef.current?.undo()}>↩ Undo</button>
           <button style={styles.tbBtn} onClick={() => editorRef.current?.redo()}>↪ Redo</button>
+          <button
+            style={darkTheme ? styles.tbBtnActive : styles.tbBtn}
+            onClick={() => setDarkTheme((d) => !d)}
+          >
+            {darkTheme ? '☀ Light theme' : '◑ Dark theme'}
+          </button>
         </div>
       </div>
 
       <div style={styles.section}>
         <span style={styles.label}>Editor</span>
-        <TrackEditor
-          key={processKey}
-          ref={editorRef}
-          initialText={processedHtml ? undefined : SAMPLE_TEXT}
-          initialHtml={processedHtml}
-          isVisible={true}
-          onTextChange={setHasContent}
-          onContentChange={setIsDirty}
-        />
+        {/* CSS variable overrides applied on this wrapper when dark theme is active */}
+        <div style={darkTheme ? DARK_THEME_VARS : undefined}>
+          <TrackEditor
+            key={processKey}
+            ref={editorRef}
+            initialText={processedHtml ? undefined : SAMPLE_TEXT}
+            initialHtml={processedHtml}
+            isVisible={true}
+            onTextChange={setHasContent}
+            onContentChange={setIsDirty}
+          />
+        </div>
         <p style={styles.status}>
           Has content: <strong>{hasContent ? 'yes' : 'no'}</strong>
           {' · '}
           Changed: <strong>{isDirty ? 'yes' : 'no'}</strong>
+          {' · '}
+          Theme: <strong>{darkTheme ? 'dark' : 'light'}</strong>
         </p>
       </div>
 
