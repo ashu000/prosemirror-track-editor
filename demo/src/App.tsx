@@ -2,9 +2,10 @@ import { useRef, useState } from 'react';
 import { TrackEditor } from '@prosemirror-track-editor';
 import type { TrackEditorRef } from '@prosemirror-track-editor';
 
-const SAMPLE_TEXT = `The applicant shall furnish all required documents within thirty (30) days of the issuance date of this guarantee. Failure to comply with the submission requirements may result in the suspension of credit facilities. The issuing bank reserves the right to request additional collateral at any time during the validity period. All amounts stated herein are subject to the governing law of the jurisdiction specified in the master agreement.`;
-
-const API = 'http://localhost:3001';
+// Pre-diffed HTML loaded on first render — shows the package's track-changes
+// rendering without any backend call.
+const DEMO_HTML =
+  '<p>The applicant <del>shall</del><ins>must</ins> furnish all <del>required</del><ins>mandatory</ins> documents <del>within</del><ins>no later than</ins> thirty (30) days of the issuance date of this guarantee. Failure to <del>comply</del><ins>adhere</ins> with the submission requirements may result in the suspension of credit facilities. The <del>issuing</del><ins>originating</ins> bank <del>reserves</del><ins>retains</ins> the right to <del>request</del><ins>require</ins> <del>additional</del><ins>further</ins> collateral at any time during the validity <del>period</del><ins>term</ins>. All amounts <del>stated</del><ins>specified</ins> herein are subject to the <del>governing</del><ins>applicable</ins> law of the jurisdiction specified in the master agreement.</p>';
 
 const DARK_THEME_VARS: React.CSSProperties = {
   ['--te-bg' as string]: '#1e2130',
@@ -55,32 +56,36 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 13,
     color: '#6b7280',
     marginBottom: 10,
-    lineHeight: 1.5,
+    lineHeight: 1.6,
   },
-  actions: { display: 'flex', gap: 8, marginBottom: '1rem', marginTop: '0.75rem' },
-  processBtn: {
-    padding: '9px 20px',
-    fontSize: 14,
+  legend: {
+    display: 'flex',
+    gap: 16,
+    marginTop: 8,
+    fontSize: 12,
+    color: '#6b7280',
+  },
+  legendItem: { display: 'flex', alignItems: 'center', gap: 4 },
+  insChip: {
+    background: 'rgba(37,99,235,0.1)',
+    color: '#2563eb',
+    borderRadius: 3,
+    padding: '1px 6px',
     fontWeight: 600,
-    border: 'none',
-    borderRadius: 6,
-    cursor: 'pointer',
-    background: '#2563eb',
-    color: '#fff',
+    textDecoration: 'underline',
   },
-  processBtnDisabled: {
-    padding: '9px 20px',
-    fontSize: 14,
+  delChip: {
+    background: 'rgba(185,28,28,0.08)',
+    color: '#b91c1c',
+    borderRadius: 3,
+    padding: '1px 6px',
     fontWeight: 600,
-    border: 'none',
-    borderRadius: 6,
-    cursor: 'not-allowed',
-    background: '#93c5fd',
-    color: '#fff',
+    textDecoration: 'line-through',
   },
-  clearBtn: {
-    padding: '9px 16px',
-    fontSize: 14,
+  actions: { display: 'flex', gap: 8, marginTop: '0.75rem' },
+  resetBtn: {
+    padding: '7px 16px',
+    fontSize: 13,
     fontWeight: 600,
     border: '1px solid #e5e7eb',
     borderRadius: 6,
@@ -89,66 +94,34 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#374151',
   },
   status: { fontSize: 12, color: '#9ca3af', marginTop: 6 },
-  errorBox: {
-    background: '#fef2f2',
-    border: '1px solid #fecaca',
+  infoBox: {
+    background: '#eff6ff',
+    border: '1px solid #bfdbfe',
     borderRadius: 8,
     padding: '0.75rem 1rem',
     fontSize: 13,
-    color: '#b91c1c',
-    marginBottom: '1rem',
+    color: '#1d4ed8',
+    marginTop: '1.25rem',
+    lineHeight: 1.6,
   },
-  successBox: {
-    background: '#f0fdf4',
-    border: '1px solid #bbf7d0',
-    borderRadius: 8,
-    padding: '0.75rem 1rem',
-    fontSize: 13,
-    color: '#15803d',
-    marginBottom: '1rem',
+  code: {
+    fontFamily: 'monospace',
+    fontSize: 12,
+    background: 'rgba(0,0,0,0.06)',
+    borderRadius: 3,
+    padding: '1px 5px',
   },
-  loading: { fontSize: 13, color: '#6b7280', padding: '0.5rem 0' },
 };
 
 export function App() {
   const editorRef = useRef<TrackEditorRef>(null);
   const [isDirty, setIsDirty] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [changeCount, setChangeCount] = useState<number | null>(null);
-  const [processedHtml, setProcessedHtml] = useState<string | undefined>(undefined);
-  const [processKey, setProcessKey] = useState(0);
+  const [resetKey, setResetKey] = useState(0);
   const [darkTheme, setDarkTheme] = useState(false);
 
-  const handleProcess = async () => {
-    setError(null);
-    setChangeCount(null);
-    const text = editorRef.current?.getOriginalText() ?? '';
-    if (!text.trim()) { setError('Editor is empty.'); return; }
-    setIsLoading(true);
-    try {
-      const res = await fetch(`${API}/process`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? 'Process failed');
-      setProcessedHtml(data.html);
-      setProcessKey((k) => k + 1);
-      setChangeCount(data.changeCount);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Unknown error');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleClear = () => {
-    setError(null);
-    setChangeCount(null);
-    setProcessedHtml(undefined);
-    setProcessKey((k) => k + 1);
+  const handleReset = () => {
+    setResetKey((k) => k + 1);
+    setIsDirty(false);
   };
 
   return (
@@ -156,7 +129,7 @@ export function App() {
       <div style={styles.header}>
         <h1 style={styles.title}>prosemirror-track-editor</h1>
         <p style={styles.subtitle}>
-          A React track-changes editor — edit text, process with AI, review insertions and deletions inline.
+          A React editor with track-changes — review insertions and deletions inline.
         </p>
         <div style={styles.toolbar}>
           <button style={styles.tbBtn} onClick={() => editorRef.current?.undo()}>↩ Undo</button>
@@ -172,46 +145,37 @@ export function App() {
 
       <div style={styles.section}>
         <p style={styles.hint}>
-          Edit the text below — add or delete words — then click <strong>Process with AI</strong> to see tracked changes applied inline.
+          The editor below shows tracked changes pre-loaded — words struck through are deletions, underlined words are insertions. Edit freely; every addition and removal is tracked.
         </p>
         <div style={darkTheme ? DARK_THEME_VARS : undefined}>
           <TrackEditor
-            key={processKey}
+            key={resetKey}
             ref={editorRef}
-            initialText={processedHtml ? undefined : SAMPLE_TEXT}
-            initialHtml={processedHtml}
+            initialHtml={DEMO_HTML}
             isVisible={true}
             onContentChange={setIsDirty}
             ariaLabel="Track changes editor"
           />
         </div>
-        <p style={styles.status}>
-          {isDirty ? 'Unsaved changes' : 'No changes yet'}
-          {changeCount !== null && ` · ${changeCount} suggestion${changeCount !== 1 ? 's' : ''} applied`}
-        </p>
+        <div style={styles.legend}>
+          <span style={styles.legendItem}>
+            <span style={styles.delChip}>deleted</span> deletion
+          </span>
+          <span style={styles.legendItem}>
+            <span style={styles.insChip}>inserted</span> insertion
+          </span>
+        </div>
+        <p style={styles.status}>{isDirty ? 'Edited' : 'Showing pre-loaded diff'}</p>
       </div>
 
       <div style={styles.actions}>
-        <button
-          style={isLoading ? styles.processBtnDisabled : styles.processBtn}
-          onClick={handleProcess}
-          disabled={isLoading}
-        >
-          {isLoading ? 'Processing…' : '✦ Process with AI'}
-        </button>
-        <button style={styles.clearBtn} onClick={handleClear}>
-          Reset
-        </button>
+        <button style={styles.resetBtn} onClick={handleReset}>Reset demo</button>
       </div>
 
-      {error && <div style={styles.errorBox}>{error}</div>}
-      {changeCount !== null && !error && (
-        <div style={styles.successBox}>
-          {changeCount === 0
-            ? 'No changes suggested.'
-            : `${changeCount} suggestion${changeCount !== 1 ? 's' : ''} applied — accept or reject each change in the editor.`}
-        </div>
-      )}
+      <div style={styles.infoBox}>
+        Wire up your own backend to load diffed HTML into the editor via <span style={styles.code}>setText(html)</span> or the <span style={styles.code}>initialHtml</span> prop.
+        See the <a href="https://github.com/ashu000/prosemirror-track-editor#readme" style={{ color: '#2563eb' }}>README</a> for the full ref API.
+      </div>
     </div>
   );
 }
