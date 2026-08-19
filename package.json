@@ -1,5 +1,5 @@
 {
-  "name": "@ashutosh-dubey3/prosemirror-track-editor",
+  "name": "@ashu000/prosemirror-track-editor",
   "version": "0.1.0",
   "description": "A headless-first React editor with track-changes (insertion/deletion marks), phrase navigation, and a clean ref API.",
   "type": "module",
@@ -74,7 +74,7 @@
   "author": "Ashutosh Dubey",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ashutosh-dubey3/prosemirror-track-editor.git"
+    "url": "git+https://github.com/ashu000/prosemirror-track-editor.git"
   },
   "license": "MIT"
 }
