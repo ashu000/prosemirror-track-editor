@@ -14,7 +14,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "LICENSE"
   ],
   "scripts": {
     "dev": "concurrently \"vite --config vite.demo.config.ts\" \"tsx demo/server/index.ts\"",
@@ -71,6 +72,7 @@
     "diff",
     "suggest-changes"
   ],
+  "homepage": "https://github.com/ashu000/prosemirror-track-editor#readme",
   "author": "Ashutosh Dubey",
   "repository": {
     "type": "git",
